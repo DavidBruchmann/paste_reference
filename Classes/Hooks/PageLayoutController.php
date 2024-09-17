@@ -118,7 +118,7 @@ class PageLayoutController
         return '';
     }
 
-    protected function getJsArgumentsArray($elFromTable): array
+    protected function getJsArgumentsArray(array $elFromTable): array
     {
         $pasteItem = (int)substr((string)key($elFromTable), 11);
         $pasteRecord = BackendUtility::getRecordWSOL('tt_content', $pasteItem);
