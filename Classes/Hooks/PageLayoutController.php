@@ -32,6 +32,7 @@ use TYPO3\CMS\Core\Configuration\Exception\ExtensionConfigurationPathDoesNotExis
 use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
 use TYPO3\CMS\Core\Imaging\Icon;
 use TYPO3\CMS\Core\Imaging\IconFactory;
+use TYPO3\CMS\Core\Page\JavaScriptModuleInstruction;
 use TYPO3\CMS\Core\Page\PageRenderer;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -41,21 +42,11 @@ class PageLayoutController
      * @var array|mixed
      */
     protected array $extensionConfiguration = [];
-
-    /**
-     * @var PageRenderer
-     */
     protected PageRenderer $pageRenderer;
-
-    /**
-     * @var IconFactory
-     */
     protected IconFactory $iconFactory;
-
-    /**
-     * @var Helper
-     */
     protected Helper $helper;
+    protected string $LLL = 'LLL:EXT:paste_reference/Resources/Private/Language/locallang_db.xml';
+    protected string $jsScriptName = '@ehaerer/paste-reference/paste-reference.js';
 
     /**
      * @param PageRenderer $pageRenderer
@@ -86,60 +77,64 @@ class PageLayoutController
         $elFromTable = $clipboard->elFromTable('tt_content');
 
         // pull locallang_db.xml to JS side - only the tx_paste_reference_js-prefixed keys
+        $languageFile = str_starts_with($this->LLL, 'LLL:') ? substr($this->LLL, 4) : $this->LLL;
         $this->pageRenderer->addInlineLanguageLabelFile(
-            'EXT:paste_reference/Resources/Private/Language/locallang_db.xlf',
+            $languageFile,
             'tx_paste_reference_js'
         );
 
-        $pAddExtOnReadyCode = '';
+        $jsLines = [];
 
         $uriBuilder = GeneralUtility::makeInstance(UriBuilder::class);
+        // TODO: is the try - catch statement here really required?
         try {
-            $pAddExtOnReadyCode .= '
-                top.pasteReferenceAllowed = ' . (int)$this->helper->getBackendUser()->checkAuthMode(
-                    'tt_content',
-                    'CType',
-                    'shortcut') . ';
-                top.browserUrl = ' . json_encode((string)$uriBuilder->buildUriFromRoute('wizard_element_browser')) . ';';
+            $jsLines[] = 'top.pasteReferenceAllowed = ' . (int)$this->helper->getBackendUser()->checkAuthMode('tt_content', 'CType', 'shortcut') . ';';
+            $jsLines[] = 'top.browserUrl = ' . json_encode((string)$uriBuilder->buildUriFromRoute('wizard_element_browser')) . ';';
         } catch (RouteNotFoundException $e) {
         }
 
         if (!empty($elFromTable)) {
-            $pasteItem = (int)substr((string)key($elFromTable), 11);
-            $pasteRecord = BackendUtility::getRecordWSOL('tt_content', $pasteItem);
-            $pasteTitle = BackendUtility::getRecordTitle('tt_content', $pasteRecord);
 
             if (!(bool)($this->extensionConfiguration['disableCopyFromPageButton'] ?? false)
                 && !(bool)($this->helper->getBackendUser()->uc['disableCopyFromPageButton'] ?? false)
             ) {
-                /* @todo: the file @haerer/paste-reference/paste-reference.js doesn't exist.
-                 * @todo: It should add a button next to "+ Content"
-                 * $this->pageRenderer->getJavaScriptRenderer()->addJavaScriptModuleInstruction(
-                 * JavaScriptModuleInstruction::create('@haerer/paste-reference/paste-reference.js')
-                 * ->instance([
-                 * 'itemOnClipboardUid' => $pasteItem,
-                 * 'itemOnClipboardTitle' => $pasteTitle,
-                 * 'copyMode' => $clipboard->clipData['normal']['mode'] ?? '',
-                 * ])
-                 * );*/
-
-                $pAddExtOnReadyCode .= '
-                    top.copyFromAnotherPageLinkTemplate = ' . json_encode('<button type="button" class="t3js-paste-new btn btn-default" title="' . $this->helper->getLanguageService()->sL('LLL:EXT:paste_reference/Resources/Private/Language/locallang_db.xml:tx_paste_reference_js.copyfrompage') . '">' . $this->iconFactory->getIcon(
-                            'actions-insert-reference',
-                            Icon::SIZE_SMALL
-                        )->render() . '</button>') . ';';
+                $JavaScriptModuleInstruction = JavaScriptModuleInstruction::create($this->jsScriptName);
+                /** @var TYPO3\CMS\Core\Page\JavaScriptRenderer */
+                $javaScriptRenderer = $this->pageRenderer->getJavaScriptRenderer();
+                $javaScriptRenderer->addJavaScriptModuleInstruction(
+                    $JavaScriptModuleInstruction->instance(
+                        $this->getJsArgumentsArray($elFromTable)
+                    )
+                );
+                $jsLines[] = 'top.copyFromAnotherPageLinkTemplate = ' . json_encode($this->getButtonTemplate()) . ';';
             }
         }
 
-        $this->pageRenderer->addJsInlineCode(
-            'pasterefExtOnReady',
-            $pAddExtOnReadyCode,
-            true,
-            false,
-            true
-        );
+        if (count($jsLines)) {
+            $javaScript = implode("\n", $jsLines);
+            $this->pageRenderer->addJsInlineCode('pasterefExtOnReady', $javaScript, true, false, true);
+        }
 
         return '';
+    }
+
+    protected function getJsArgumentsArray($elFromTable): array
+    {
+        $pasteItem = (int)substr((string)key($elFromTable), 11);
+        $pasteRecord = BackendUtility::getRecordWSOL('tt_content', $pasteItem);
+        $pasteTitle = BackendUtility::getRecordTitle('tt_content', $pasteRecord);
+        return [
+            'itemOnClipboardUid' => $pasteItem,
+            'itemOnClipboardTitle' => $pasteTitle,
+            'copyMode' => $clipboard->clipData['normal']['mode'] ?? '',
+        ];
+    }
+
+    protected function getButtonTemplate(): string
+    {
+        $title = $this->helper->getLanguageService()->sL($this->LLL . ':tx_paste_reference_js.copyfrompage');
+        $icon = $this->iconFactory->getIcon('actions-insert-reference', Icon::SIZE_SMALL)->render();
+        return '<button type="button" class="t3js-paste-new btn btn-default" title="' . $title . '">' . $icon . '</button>';
     }
 
 }
