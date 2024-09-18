@@ -42,8 +42,8 @@ class PageLayoutController
     protected array $extensionConfiguration = [];
     protected string $LLL = 'LLL:EXT:paste_reference/Resources/Private/Language/locallang_db.xml';
     protected string $jsScriptName = '@ehaerer/paste-reference/paste-reference.js';
+    protected array $elFromTable = [];
 
-    protected Clipboard $clipboard;
     protected Helper $helper;
     protected IconFactory $iconFactory;
     protected PageRenderer $pageRenderer;
@@ -60,7 +60,8 @@ class PageLayoutController
         $this->helper = GeneralUtility::makeInstance(Helper::class);
         $this->iconFactory = $iconFactory;
         $this->pageRenderer = $pageRenderer;
-        $this->initClipboard();
+
+        $this->elFromTable = $this->getClipboard()->elFromTable('tt_content');
     }
 
     /**
@@ -81,33 +82,20 @@ class PageLayoutController
             $jsLines[] = 'top.browserUrl = ' . json_encode((string)$uriBuilder->buildUriFromRoute('wizard_element_browser')) . ';';
         } catch (RouteNotFoundException $e) {}
 
-        $elFromTable = $this->clipboard->elFromTable('tt_content');
-        if (!empty($elFromTable)
+        if (!empty($this->elFromTable)
             && !(bool)($this->extensionConfiguration['disableCopyFromPageButton'] ?? false)
             && !(bool)($this->helper->getBackendUser()->uc['disableCopyFromPageButton'] ?? false)
         ) {
-            $this->addJavaScriptModuleInstruction($elFromTable);
+            $this->addJavaScriptModuleInstruction();
             $jsLines[] = 'top.copyFromAnotherPageLinkTemplate = ' . json_encode($this->getButtonTemplate()) . ';';
         }
 
         if (count($jsLines)) {
             $javaScript = implode("\n", $jsLines);
-            $this->pageRenderer->addJsInlineCode('pasterefExtOnReady', $javaScript, true, false, true);
+            $this->pageRenderer->addJsInlineCode('pasteReference', $javaScript, true, false, true);
         }
 
         return '';
-    }
-
-    protected function getJsArgumentsArray(array $elFromTable): array
-    {
-        $pasteItem = (int)substr((string)key($elFromTable), 11);
-        $pasteRecord = BackendUtility::getRecordWSOL('tt_content', $pasteItem);
-        $pasteTitle = BackendUtility::getRecordTitle('tt_content', $pasteRecord);
-        return [
-            'itemOnClipboardUid' => $pasteItem,
-            'itemOnClipboardTitle' => $pasteTitle,
-            'copyMode' => $this->clipboard->clipData['normal']['mode'] ?? '',
-        ];
     }
 
     protected function getButtonTemplate(): string
@@ -117,26 +105,38 @@ class PageLayoutController
         return '<button type="button" class="t3js-paste-new btn btn-default" title="' . $title . '">' . $icon . '</button>';
     }
 
-    protected function initClipboard()
-    {
-        $clipboard = GeneralUtility::makeInstance(Clipboard::class);
-        $clipboard->initializeClipboard();
-        $clipboard->lockToNormal();
-        $clipboard->cleanCurrent();
-        $clipboard->endClipboard();
-        $this->clipboard = $clipboard;
-    }
-
-    protected function addJavaScriptModuleInstruction($elFromTable)
+    protected function addJavaScriptModuleInstruction(): void
     {
         $JavaScriptModuleInstruction = JavaScriptModuleInstruction::create($this->jsScriptName);
         /** @var TYPO3\CMS\Core\Page\JavaScriptRenderer */
         $javaScriptRenderer = $this->pageRenderer->getJavaScriptRenderer();
         $javaScriptRenderer->addJavaScriptModuleInstruction(
             $JavaScriptModuleInstruction->instance(
-                $this->getJsArgumentsArray($elFromTable)
+                $this->getJsArgumentsArray()
             )
         );
+    }
+
+    protected function getJsArgumentsArray(): array
+    {
+        $pasteItem = (int)substr((string)key($this->elFromTable), 11);
+        $pasteRecord = BackendUtility::getRecordWSOL('tt_content', $pasteItem);
+        $pasteTitle = BackendUtility::getRecordTitle('tt_content', $pasteRecord);
+        return [
+            'itemOnClipboardUid' => $pasteItem,
+            'itemOnClipboardTitle' => $pasteTitle,
+            'copyMode' => $this->getClipboard()->clipData['normal']['mode'] ?? '',
+        ];
+    }
+
+    protected function getClipboard(): Clipboard
+    {
+        $clipboard = GeneralUtility::makeInstance(Clipboard::class);
+        $clipboard->initializeClipboard();
+        $clipboard->lockToNormal();
+        $clipboard->cleanCurrent();
+        $clipboard->endClipboard();
+        return $clipboard;
     }
 
 }
