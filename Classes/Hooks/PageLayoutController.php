@@ -38,15 +38,15 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class PageLayoutController
 {
-    /**
-     * @var array|mixed
-     */
+    /** @var array|mixed */
     protected array $extensionConfiguration = [];
-    protected PageRenderer $pageRenderer;
-    protected IconFactory $iconFactory;
-    protected Helper $helper;
     protected string $LLL = 'LLL:EXT:paste_reference/Resources/Private/Language/locallang_db.xml';
     protected string $jsScriptName = '@ehaerer/paste-reference/paste-reference.js';
+
+    protected Clipboard $clipboard;
+    protected Helper $helper;
+    protected IconFactory $iconFactory;
+    protected PageRenderer $pageRenderer;
 
     /**
      * @param PageRenderer $pageRenderer
@@ -57,9 +57,10 @@ class PageLayoutController
     public function __construct(PageRenderer $pageRenderer, IconFactory $iconFactory)
     {
         $this->extensionConfiguration = GeneralUtility::makeInstance(ExtensionConfiguration::class)->get('paste_reference');
-        $this->pageRenderer = $pageRenderer;
-        $this->iconFactory = $iconFactory;
         $this->helper = GeneralUtility::makeInstance(Helper::class);
+        $this->iconFactory = $iconFactory;
+        $this->pageRenderer = $pageRenderer;
+        $this->initClipboard();
     }
 
     /**
@@ -68,46 +69,25 @@ class PageLayoutController
      */
     public function drawHeaderHook(): string
     {
-        $clipboard = GeneralUtility::makeInstance(Clipboard::class);
-        $clipboard->initializeClipboard();
-        $clipboard->lockToNormal();
-        $clipboard->cleanCurrent();
-        $clipboard->endClipboard();
-
-        $elFromTable = $clipboard->elFromTable('tt_content');
-
         // pull locallang_db.xml to JS side - only the tx_paste_reference_js-prefixed keys
         $languageFile = str_starts_with($this->LLL, 'LLL:') ? substr($this->LLL, 4) : $this->LLL;
-        $this->pageRenderer->addInlineLanguageLabelFile(
-            $languageFile,
-            'tx_paste_reference_js'
-        );
+        $this->pageRenderer->addInlineLanguageLabelFile($languageFile, 'tx_paste_reference_js');
 
         $jsLines = [];
 
         $uriBuilder = GeneralUtility::makeInstance(UriBuilder::class);
-        // TODO: is the try - catch statement here really required?
         try {
             $jsLines[] = 'top.pasteReferenceAllowed = ' . (int)$this->helper->getBackendUser()->checkAuthMode('tt_content', 'CType', 'shortcut') . ';';
             $jsLines[] = 'top.browserUrl = ' . json_encode((string)$uriBuilder->buildUriFromRoute('wizard_element_browser')) . ';';
-        } catch (RouteNotFoundException $e) {
-        }
+        } catch (RouteNotFoundException $e) {}
 
-        if (!empty($elFromTable)) {
-
-            if (!(bool)($this->extensionConfiguration['disableCopyFromPageButton'] ?? false)
-                && !(bool)($this->helper->getBackendUser()->uc['disableCopyFromPageButton'] ?? false)
-            ) {
-                $JavaScriptModuleInstruction = JavaScriptModuleInstruction::create($this->jsScriptName);
-                /** @var TYPO3\CMS\Core\Page\JavaScriptRenderer */
-                $javaScriptRenderer = $this->pageRenderer->getJavaScriptRenderer();
-                $javaScriptRenderer->addJavaScriptModuleInstruction(
-                    $JavaScriptModuleInstruction->instance(
-                        $this->getJsArgumentsArray($elFromTable)
-                    )
-                );
-                $jsLines[] = 'top.copyFromAnotherPageLinkTemplate = ' . json_encode($this->getButtonTemplate()) . ';';
-            }
+        $elFromTable = $this->clipboard->elFromTable('tt_content');
+        if (!empty($elFromTable)
+            && !(bool)($this->extensionConfiguration['disableCopyFromPageButton'] ?? false)
+            && !(bool)($this->helper->getBackendUser()->uc['disableCopyFromPageButton'] ?? false)
+        ) {
+            $this->addJavaScriptModuleInstruction($elFromTable);
+            $jsLines[] = 'top.copyFromAnotherPageLinkTemplate = ' . json_encode($this->getButtonTemplate()) . ';';
         }
 
         if (count($jsLines)) {
@@ -126,7 +106,7 @@ class PageLayoutController
         return [
             'itemOnClipboardUid' => $pasteItem,
             'itemOnClipboardTitle' => $pasteTitle,
-            'copyMode' => $clipboard->clipData['normal']['mode'] ?? '',
+            'copyMode' => $this->clipboard->clipData['normal']['mode'] ?? '',
         ];
     }
 
@@ -135,6 +115,28 @@ class PageLayoutController
         $title = $this->helper->getLanguageService()->sL($this->LLL . ':tx_paste_reference_js.copyfrompage');
         $icon = $this->iconFactory->getIcon('actions-insert-reference', Icon::SIZE_SMALL)->render();
         return '<button type="button" class="t3js-paste-new btn btn-default" title="' . $title . '">' . $icon . '</button>';
+    }
+
+    protected function initClipboard()
+    {
+        $clipboard = GeneralUtility::makeInstance(Clipboard::class);
+        $clipboard->initializeClipboard();
+        $clipboard->lockToNormal();
+        $clipboard->cleanCurrent();
+        $clipboard->endClipboard();
+        $this->clipboard = $clipboard;
+    }
+
+    protected function addJavaScriptModuleInstruction($elFromTable)
+    {
+        $JavaScriptModuleInstruction = JavaScriptModuleInstruction::create($this->jsScriptName);
+        /** @var TYPO3\CMS\Core\Page\JavaScriptRenderer */
+        $javaScriptRenderer = $this->pageRenderer->getJavaScriptRenderer();
+        $javaScriptRenderer->addJavaScriptModuleInstruction(
+            $JavaScriptModuleInstruction->instance(
+                $this->getJsArgumentsArray($elFromTable)
+            )
+        );
     }
 
 }
