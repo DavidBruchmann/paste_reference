@@ -60,8 +60,8 @@ handleDbmsOptions() {
                 echo "Use \".Build/Scripts/runTests.sh -h\" to display help and valid options" >&2
                 exit 1
             fi
-            [ -z "${DBMS_VERSION}" ] && DBMS_VERSION="10.4"
-            if ! [[ ${DBMS_VERSION} =~ ^(10.3|10.4|10.5|10.6|10.7|10.8|10.9|10.10|10.11|11.0|11.1)$ ]]; then
+            [ -z "${DBMS_VERSION}" ] && DBMS_VERSION="11.4"
+            if ! [[ ${DBMS_VERSION} =~ ^(10.4|10.5|10.6|10.7|10.8|10.9|10.10|10.11|11.0|11.1|11.4|11.8|12.0|12.1|12.2|12.3|13.0)$ ]]; then
                 echo "Invalid combination -d ${DBMS} -i ${DBMS_VERSION}" >&2
                 echo >&2
                 echo "Use \".Build/Scripts/runTests.sh -h\" to display help and valid options" >&2
@@ -76,8 +76,8 @@ handleDbmsOptions() {
                 echo "Use \".Build/Scripts/runTests.sh -h\" to display help and valid options" >&2
                 exit 1
             fi
-            [ -z "${DBMS_VERSION}" ] && DBMS_VERSION="8.0"
-            if ! [[ ${DBMS_VERSION} =~ ^(8.0|8.1|8.2|8.3)$ ]]; then
+            [ -z "${DBMS_VERSION}" ] && DBMS_VERSION="8.4"
+            if ! [[ ${DBMS_VERSION} =~ ^(8.0|8.1|8.2|8.3|8.4|9.7)$ ]]; then
                 echo "Invalid combination -d ${DBMS} -i ${DBMS_VERSION}" >&2
                 echo >&2
                 echo "Use \".Build/Scripts/runTests.sh -h\" to display help and valid options" >&2
@@ -91,8 +91,8 @@ handleDbmsOptions() {
                 echo "Use \".Build/Scripts/runTests.sh -h\" to display help and valid options" >&2
                 exit 1
             fi
-            [ -z "${DBMS_VERSION}" ] && DBMS_VERSION="10"
-            if ! [[ ${DBMS_VERSION} =~ ^(10|11|12|13|14|15|16)$ ]]; then
+            [ -z "${DBMS_VERSION}" ] && DBMS_VERSION="16"
+            if ! [[ ${DBMS_VERSION} =~ ^(10|11|12|13|14|15|16|17|18)$ ]]; then
                 echo "Invalid combination -d ${DBMS} -i ${DBMS_VERSION}" >&2
                 echo >&2
                 echo "Use \".Build/Scripts/runTests.sh -h\" to display help and valid options" >&2
@@ -171,35 +171,45 @@ Options:
     -i version
         Specify a specific database version
         With "-d mariadb":
-            - 10.3   short-term, maintained until 2023-05-25 (default)
-            - 10.4   short-term, maintained until 2024-06-18
-            - 10.5   short-term, maintained until 2025-06-24
-            - 10.6   long-term, maintained until 2026-06
-            - 10.7   short-term, no longer maintained
-            - 10.8   short-term, maintained until 2023-05
-            - 10.9   short-term, maintained until 2023-08
-            - 10.10  short-term, maintained until 2023-11
+            - 10.4   short-term, unmaintained since 2024-06-18
+            - 10.5   short-term, unmaintained since 2025-06-24
+            - 10.6   long-term, unmaintained since 2026-06
+            - 10.7   short-term, unmaintained
+            - 10.8   short-term, unmaintained since 2023-05
+            - 10.9   short-term, unmaintained since 2023-08
+            - 10.10  short-term, unmaintained since 2023-11
             - 10.11  long-term, maintained until 2028-02
-            - 11.0   development series
-            - 11.1   short-term development series
+            - 11.4   long-term, maintained until 2029-05-29 (default)
+            - 11.8   long-term, maintained until 2028-06-28
+            - 12.0   short-term, unmaintained since 2025-09
+            - 12.1   short-term, unmaintained since 2025-12
+            - 12.2   short-term, unmaintained since 2026-03
+            - 12.3   long-term, maintained until TBC
+            - 13.0   short-term, maintained until 2026-09
         With "-d mysql":
-            - 8.0   maintained until 2026-04 (default) LTS
+            - 8.0   unmaintained since 2026-05
             - 8.1   unmaintained since 2023-10
             - 8.2   unmaintained since 2024-01
-            - 8.3   maintained until 2024-04
+            - 8.3   unmaintained since 2024-05
+            - 8.4   maintained until 2029-04 (default) LTS
+            - 9.7   maintained until 2031-04
+            Versions MySQL 8.1+ are only supported in 64-bit compilation since April 2026.
+            Please consult the mysql sources for details or contradicting dates.
         With "-d postgres":
-            - 10    unmaintained since 2022-11-10 (default)
+            - 10    unmaintained since 2022-11-10
             - 11    unmaintained since 2023-11-09
-            - 12    maintained until 2024-11-14
-            - 13    maintained until 2025-11-13
+            - 12    unmaintained since 2024-11-14
+            - 13    unmaintained since 2025-11-13
             - 14    maintained until 2026-11-12
             - 15    maintained until 2027-11-11
-            - 16    maintained until 2028-11-09
+            - 16    maintained until 2028-11-09 (default)
+            - 17    maintained until 2029-11-08
+            - 18    maintained until 2030-11-14
 
     -p <8.2|8.3|8.4|8.5>
         Specifies the PHP minor version to be used
-            - 8.2: use PHP 8.2 (default)
-            - 8.3: use PHP 8.3
+            - 8.2: use PHP 8.2
+            - 8.3: use PHP 8.3 (default)
             - 8.4: use PHP 8.4
             - 8.5: use PHP 8.5
 
@@ -249,7 +259,7 @@ TEST_SUITE="help"
 DATABASE_DRIVER=""
 DBMS="sqlite"
 DBMS_VERSION=""
-PHP_VERSION="8.2"
+PHP_VERSION="8.3"
 PHP_XDEBUG_ON=0
 PHP_XDEBUG_PORT=9003
 CGLCHECK_DRY_RUN=""
@@ -458,19 +468,13 @@ case ${TEST_SUITE} in
                 ;;
         esac
         ;;
+    javascript)
+        COMMAND="npm test -- --run --reporter=verbose"
+        SUITE_EXIT_CODE=$?
+        ;;
     lintPhp)
         COMMAND="php -v | grep '^PHP'; find . -name '*.php' ! -path './.Build/*' -print0 | xargs -0 -n1 -P4 php -dxdebug.mode=off -l >/dev/null"
         ${CONTAINER_BIN} run ${CONTAINER_COMMON_PARAMS} --name lint-php-${SUFFIX} ${IMAGE_PHP} /bin/sh -c "${COMMAND}"
-        SUITE_EXIT_CODE=$?
-        ;;
-    renderDocumentation)
-        mkdir -p Documentation-GENERATED-temp
-        ${CONTAINER_BIN} run --rm --pull always -v ./:/project/ ghcr.io/typo3-documentation/render-guides:latest --no-progress --config=Documentation Documentation
-        SUITE_EXIT_CODE=$?
-        ;;
-    renderDocumentationCheck)
-        mkdir -p Documentation-GENERATED-temp
-        ${CONTAINER_BIN} run --rm --pull always -v ./:/project/ ghcr.io/typo3-documentation/render-guides:latest --no-progress --config=Documentation Documentation --minimal-test
         SUITE_EXIT_CODE=$?
         ;;
     phpstan)
@@ -481,6 +485,16 @@ case ${TEST_SUITE} in
     phpstanGenerateBaseline)
         COMMAND="php -dxdebug.mode=off .Build/bin/phpstan analyse -c Build/phpstan/phpstan.neon --no-progress --no-interaction --memory-limit 4G --generate-baseline=Build/phpstan/phpstan-baseline.neon"
         ${CONTAINER_BIN} run ${CONTAINER_COMMON_PARAMS} --name phpstan-baseline-${SUFFIX} ${IMAGE_PHP} /bin/sh -c "${COMMAND}"
+        SUITE_EXIT_CODE=$?
+        ;;
+    renderDocumentation)
+        mkdir -p Documentation-GENERATED-temp
+        ${CONTAINER_BIN} run --rm --pull always -v ./:/project/ ghcr.io/typo3-documentation/render-guides:latest --no-progress --config=Documentation Documentation
+        SUITE_EXIT_CODE=$?
+        ;;
+    renderDocumentationCheck)
+        mkdir -p Documentation-GENERATED-temp
+        ${CONTAINER_BIN} run --rm --pull always -v ./:/project/ ghcr.io/typo3-documentation/render-guides:latest --no-progress --config=Documentation Documentation --minimal-test
         SUITE_EXIT_CODE=$?
         ;;
     unit)
