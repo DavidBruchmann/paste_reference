@@ -153,7 +153,7 @@ jobs:
       - name: Render documentation
         run: Build/Scripts/runTests.sh -s renderDocumentation
 
-      - uses: actions/upload-artifact@v5
+      - uses: actions/upload-artifact@v6
         id: artifact-upload-step
         with:
           name: rendered-documentation-folder
