@@ -6,15 +6,16 @@ namespace EHAERER\PasteReference\Domain\Repository;
 
 /***************************************************************
  *  Copyright notice
- *  (c) 2026 David Bruchmann <david.bruchmann@gmail.com>
+ *  (c) 2024-2026 David Bruchmann <david.bruchmann@gmail.com>
  *  (c) 2021-2026 Ephraim Härer <mail@ephra.im>
  *  (c) 2013 Dirk Hoffmann <dirk-hoffmann@telekom.de>
  *  All rights reserved
- *  This script is part of the TYPO3 project. The TYPO3 project is
- *  free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 2 of the License, or
- *  (at your option) any later version.
+ *
+ *  This script is part of the TYPO3 project. The TYPO3 project
+ *  is free software; you can redistribute it and/or modify it
+ *  under the terms of the GNU General Public License as
+ *  published by the Free Software Foundation; either version 2
+ *  of the License, or (at your option) any later version.
  *  The GNU General Public License can be found at
  *  http://www.gnu.org/copyleft/gpl.html.
  *  This script is distributed in the hope that it will be useful,
@@ -67,17 +68,17 @@ class TtContentRepository implements SingletonInterface
      *
      * @param string $shortcutItem The single page to be used as the tree root
      * @param-out array $collectedItems The collected item data rows ordered by parent position, column position and sorting
-     * @param int $recursive The number of levels for the recursion
      * @param int $parentUid uid of the referencing tt_content record
      * @param int $language sys_language_uid of the referencing tt_content record
+     * @param int $recursive The number of levels for the recursion
      * @throws DBALException
      */
     public function collectContentDataFromPages(
         string $shortcutItem,
         array &$collectedItems,
-        int $recursive = 0,
         int $parentUid = 0,
-        int $language = 0
+        int $language = 0,
+        int $recursive = 0  // TODO: $recursive never seems being used
     ): void {
         $itemList = str_replace('pages_', '', $shortcutItem);
         $itemList = GeneralUtility::intExplode(',', (string)$itemList);

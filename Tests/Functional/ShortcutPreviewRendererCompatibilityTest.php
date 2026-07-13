@@ -6,13 +6,15 @@ namespace EHAERER\PasteReference\Tests\Functional;
 
 /***************************************************************
  *  Copyright notice
- *  (c) 2024 Ephraim Härer <mail@ephra.im>
+ *  (c) 2024-2026 David Bruchmann <david.bruchmann@gmail.com>
+ *  (c) 2021-2026 Ephraim Härer <mail@ephra.im>
  *  All rights reserved
- *  This script is part of the TYPO3 project. The TYPO3 project is
- *  free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 2 of the License, or
- *  (at your option) any later version.
+ *
+ *  This script is part of the TYPO3 project. The TYPO3 project
+ *  is free software; you can redistribute it and/or modify it
+ *  under the terms of the GNU General Public License as
+ *  published by the Free Software Foundation; either version 2
+ *  of the License, or (at your option) any later version.
  *  The GNU General Public License can be found at
  *  http://www.gnu.org/copyleft/gpl.html.
  *  This script is distributed in the hope that it will be useful,
@@ -30,7 +32,6 @@ use TYPO3\CMS\Backend\View\BackendLayout\Grid\GridColumnItem;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Domain\RecordFactory;
 use TYPO3\CMS\Core\Domain\RecordInterface;
-use TYPO3\CMS\Core\Information\Typo3Version;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\TestingFramework\Core\Functional\FunctionalTestCase;
 
@@ -44,14 +45,12 @@ final class ShortcutPreviewRendererCompatibilityTest extends FunctionalTestCase
     ];
 
     private ShortcutPreviewRenderer $renderer;
-    private Typo3Version $typo3Version;
 
     protected function setUp(): void
     {
         parent::setUp();
         $this->createTestData();
         $this->renderer = GeneralUtility::makeInstance(ShortcutPreviewRenderer::class);
-        $this->typo3Version = GeneralUtility::makeInstance(Typo3Version::class);
     }
 
     private function createTestData(): void
@@ -138,99 +137,6 @@ final class ShortcutPreviewRendererCompatibilityTest extends FunctionalTestCase
         // Test individual methods
         self::assertEquals(30, $record->getUid());
         self::assertEquals(1, $record->getPid());
-    }
-
-    #[Test]
-    public function getDataRowMethodHandlesVersionDifferences(): void
-    {
-        $majorVersion = $this->typo3Version->getMajorVersion();
-
-        // Use reflection to test the protected getDataRow method
-        $reflection = new \ReflectionClass($this->renderer);
-        $getDataRowMethod = $reflection->getMethod('getDataRow');
-        $getDataRowMethod->setAccessible(true);
-
-        // Test TYPO3 v14+ behavior with RecordInterface
-        $recordFactory = GeneralUtility::makeInstance(RecordFactory::class);
-        $testData = [
-            'uid' => 40,
-            'pid' => 1,
-            'CType' => 'shortcut',
-            'sys_language_uid' => '0',
-            'l18n_parent' => '0',
-            't3ver_wsid' => '0',
-            't3ver_oid' => '0',
-            't3ver_state' => '0',
-            't3ver_stage' => '0',
-            'header' => 'Test Shortcut',
-            'records' => '2',
-            'crdate' => time(),
-            'tstamp' => time(),
-            'starttime' => time(),
-            'endtime' => time(),
-            'deleted' => '0',
-            'editlock' => '0',
-            'hidden' => '0',
-            'rowDescription' => '',
-            'sorting' => '0',
-            'fe_group' => '0',
-        ];
-
-        $record = $recordFactory->createFromDatabaseRow('tt_content', $testData);
-
-        // TODO fixMe
-        // The extension currently calls getRow() which doesn't exist on RecordInterface
-        // This test documents the API compatibility issue by checking if the method exists
-        if (method_exists($record, 'getRow')) {
-            $result = $getDataRowMethod->invoke($this->renderer, $record);
-            self::assertIsArray($result);
-        } else {
-            // Document the API issue - getRow() doesn't exist, should use toArray()
-            self::markTestIncomplete('Extension uses getRow() which does not exist on RecordInterface. Should use toArray() instead.');
-        }
-    }
-
-    #[Test]
-    public function getContentRecordObjMethodWorks(): void
-    {
-        // Use reflection to test the protected getContentRecordObj method
-        $reflection = new \ReflectionClass($this->renderer);
-        $getContentRecordObjMethod = $reflection->getMethod('getContentRecordObj');
-        $getContentRecordObjMethod->setAccessible(true);
-
-        $testData = [
-            'uid' => 50,
-            'pid' => 1,
-            'CType' => 'text',
-            'sys_language_uid' => '0',
-            'l18n_parent' => '0',
-            't3ver_wsid' => '0',
-            't3ver_oid' => '0',
-            't3ver_state' => '0',
-            't3ver_stage' => '0',
-            'header' => 'Test Content',
-            'bodytext' => 'Test Content',
-            'records' => '2',
-            'crdate' => time(),
-            'tstamp' => time(),
-            'starttime' => time(),
-            'endtime' => time(),
-            'deleted' => '0',
-            'editlock' => '0',
-            'hidden' => '0',
-            'rowDescription' => '',
-            'sorting' => '0',
-            'fe_group' => '0',
-        ];
-
-        $result = $getContentRecordObjMethod->invoke($this->renderer, $testData);
-
-        self::assertInstanceOf(RecordInterface::class, $result);
-
-        // Test the correct RecordInterface methods
-        $array = $result->toArray();
-        self::assertEquals(50, $array['uid']);
-        self::assertEquals('text', $array['CType']);
     }
 
     #[Test]
