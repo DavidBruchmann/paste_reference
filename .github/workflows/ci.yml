@@ -99,7 +99,7 @@ jobs:
         run: npm ci
 
       - name: Run JavaScript tests
-        run: npm test -- --run --reporter=verbose
+        run: npm test -- --reporter=verbose
 
   #---------------------------------------------------------------------------------------------------------------------
   # Extended tests - focus on reliability over comprehensive database testing
@@ -136,7 +136,7 @@ jobs:
         timeout-minutes: 15
 
       - name: Run JavaScript tests
-        run: npm test -- --run --reporter=verbose
+        run: npm test -- --reporter=verbose
         timeout-minutes: 5
 
   documentation:
