@@ -1,6 +1,12 @@
-<?php
+<?php /** @noinspection PhpUndefinedVariableInspection */
 
-/** @noinspection PhpUndefinedVariableInspection */
+/*
+ * This file is part of the package ehaerer/paste-reference.
+ *
+ * For the full copyright and license information, please read the
+ * LICENSE file that was distributed with this source code.
+ */
+
 $EM_CONF[$_EXTKEY] = [
     'title' => 'Test Sitepackage',
     'description' => 'Simple sitepackage for testing paste-reference with container extension',
