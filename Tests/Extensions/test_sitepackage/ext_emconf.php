@@ -1,7 +1,5 @@
 <?php
 
-/** @noinspection PhpUndefinedVariableInspection */
-
 /*
  * This file is part of the package ehaerer/paste-reference.
  *
@@ -9,6 +7,7 @@
  * LICENSE file that was distributed with this source code.
  */
 
+/** @phpstan-ignore variable.undefined */
 $EM_CONF[$_EXTKEY] = [
     'title' => 'Test Sitepackage',
     'description' => 'Simple sitepackage for testing paste-reference with container extension',
