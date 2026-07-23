@@ -11,22 +11,51 @@ declare(strict_types=1);
 namespace Test\Sitepackage\Controller;
 
 use Psr\Http\Message\ResponseInterface;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
+use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
+use Test\Sitepackage\Domain\Repository\IrreRepository;
 
 class IrreController extends ActionController
 {
+    public function __construct(
+        private readonly IrreRepository $irreRepository
+    ) {
+    }
+
     public function indexAction(): ResponseInterface
     {
+        //$pageId = $this->request->getAttributes()['routing']->getPageId();
+        $cObj = $this->request->getAttribute('currentContentObject');
+        $data = $cObj->data;
+        $currentRecord = $this->irreRepository->findByUid((int) $data['uid']);
+        $childRecords = $this->irreRepository->getChildRecords((int) $data['uid']);
+        $this->view->assign('data', $data);
+        $this->view->assign('childRecords', $childRecords);
         return $this->htmlResponse();
     }
 
     public function showAction(): ResponseInterface
     {
+        //$pageId = $this->request->getAttributes()['routing']->getPageId();
+        $cObj = $this->request->getAttribute('currentContentObject');
+        $data = $cObj->data;
+        $currentRecord = $this->irreRepository->findByUid((int) $data['uid']);
+        $childRecords = $this->irreRepository->getChildRecords((int) $data['uid']);
+        $this->view->assign('data', $data);
+        $this->view->assign('childRecords', $childRecords);
         return $this->htmlResponse();
     }
 
     public function listAction(): ResponseInterface
     {
+        //$pageId = $this->request->getAttributes()['routing']->getPageId();
+        $cObj = $this->request->getAttribute('currentContentObject');
+        $data = $cObj->data;
+        $currentRecord = $this->irreRepository->findByUid((int) $data['uid']);
+        $childRecords = $this->irreRepository->getChildRecords((int) $data['uid']);
+        $this->view->assign('data', $data);
+        $this->view->assign('childRecords', $childRecords);
         return $this->htmlResponse();
     }
 }

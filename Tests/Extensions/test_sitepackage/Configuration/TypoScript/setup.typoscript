@@ -56,33 +56,33 @@ tt_content.ce_columns2 {
 }
 
 plugin.tx_testsitepackage_inlinerecordsirre {
+    extensionName = TestSitepackage
+    pluginName = InlineRecordsIrre
+    vendorName = Test
+
+    #settings.detailPid = 42
+    mvc.callDefaultActionIfActionCantBeResolved = 1
+    settings.foo = bar
     view {
-        templateRootPaths.0 = EXT:test_sitepackage/Resources/Private/Templates/
-        templateRootPaths.10 = {$plugin.tx_testsitepackage_inlinerecordsirre.view.templateRootPath}
-        partialRootPaths.0 = EXT:test_sitepackage/Resources/Private/Partials/
-        partialRootPaths.10 = {$plugin.tx_testsitepackage_inlinerecordsirre.view.partialRootPath}
-        layoutRootPaths.0 = EXT:test_sitepackage/Resources/Private/Layouts/
-        layoutRootPaths.10 = {$plugin.tx_testsitepackage_inlinerecordsirre.view.layoutRootPath}
+        layoutRootPaths {
+            10 = EXT:test_sitepackage/Resources/Private/Layouts/ContentElements/
+            20 = {$plugin.tx_testsitepackage_inlinerecordsirre.view.layoutRootPath}
+        }
+        partialRootPaths {
+            10 = EXT:test_sitepackage/Resources/Private/Partials/ContentElements/
+            20 = {$plugin.tx_testsitepackage_inlinerecordsirre.view.partialRootPath}
+        }
+        templateRootPaths {
+            10 = EXT:test_sitepackage/Resources/Private/Templates/
+            20 = EXT:test_sitepackage/Resources/Private/Templates/ContentElements/
+            30 = {$plugin.tx_testsitepackage_inlinerecordsirre.view.templateRootPath}
+        }
     }
     persistence {
-        storagePid = {$plugin.plugin.tx_testsitepackage_inlinerecordsirre.persistence.storagePid}
+        storagePid = 226
+        # {$plugin.plugin.tx_testsitepackage_inlinerecordsirre.persistence.storagePid}
     }
-}
-tt_content.tx_testsitepacke_parent = FLUIDTEMPLATE
-tt_content.tx_testsitepacke_parent {
-    templateName = TxTestsitepackeParent
-    layoutRootPaths {
-        10 = EXT:test_sitepackage/Resources/Private/Layouts/ContentElements/
-        20 = {$plugin.tx_testsitepackage_inlinerecordsirre.view.layoutRootPath}
-    }
-    partialRootPaths {
-        10 = EXT:test_sitepackage/Resources/Private/Partials/ContentElements/
-        20 = {$plugin.tx_testsitepackage_inlinerecordsirre.view.partialRootPath}
-    }
-    templateRootPaths {
-        10 = EXT:test_sitepackage/Resources/Private/Templates/ContentElements/
-        20 = {$plugin.tx_testsitepackage_inlinerecordsirre.view.templateRootPath}
-    }
+    /*
     dataProcessing {
         10 = TYPO3\CMS\Frontend\DataProcessing\DatabaseQueryProcessor
         10 {
@@ -93,4 +93,16 @@ tt_content.tx_testsitepacke_parent {
             as = childElements
         }
     }
+    stdWrap {
+        debug = 1
+    }
+    */
 }
+
+tt_content.testsitepackage_inlinerecordsirre = EXTBASEPLUGIN
+tt_content.testsitepackage_inlinerecordsirre {
+    extensionName = TestSitepackage
+    pluginName = InlineRecordsIrre
+    vendorName = Test
+}
+
