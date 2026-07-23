@@ -1,5 +1,6 @@
-<?php /** @noinspection PhpUndefinedVariableInspection */
+<?php
 
+/** @noinspection PhpUndefinedVariableInspection */
 $EM_CONF[$_EXTKEY] = [
     'title' => 'Test Sitepackage',
     'description' => 'Simple sitepackage for testing paste-reference with container extension',
