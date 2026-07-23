@@ -1,4 +1,6 @@
-<?php /** @noinspection PhpUndefinedVariableInspection */
+<?php
+
+/** @noinspection PhpUndefinedVariableInspection */
 
 /*
  * This file is part of the package ehaerer/paste-reference.
