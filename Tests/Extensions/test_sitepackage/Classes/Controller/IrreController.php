@@ -13,9 +13,7 @@ namespace Test\Sitepackage\Controller;
 
 use Psr\Http\Message\ResponseInterface;
 use Test\Sitepackage\Domain\Repository\IrreRepository;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
-use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
 
 class IrreController extends ActionController
 {
