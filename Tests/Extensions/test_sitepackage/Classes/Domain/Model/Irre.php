@@ -43,7 +43,6 @@ class Irre extends AbstractEntity
         $this->txTestsitepackeParent = $txTestsitepackeParent;
     }
 
-
     /**
      * @return ObjectStorage<Irre>
      */

@@ -1,6 +1,7 @@
 <?php
 
 use TYPO3\CMS\Core\Imaging\IconProvider\SvgIconProvider;
+
 return [
     'ext-test-sitepackage-plugin' => [
         'provider' => SvgIconProvider::class,

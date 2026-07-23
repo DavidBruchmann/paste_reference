@@ -1,17 +1,17 @@
 <?php
 
-# declare(strict_types=1);
+declare(strict_types=1);
 
 use TYPO3\CMS\Extbase\Utility\ExtensionUtility;
 use Test\Sitepackage\Controller\IrreController;
 
-# defined('TYPO3') or die;
+defined('TYPO3') or die;
 
 ExtensionUtility::configurePlugin(
     'TestSitepackage',
     'InlineRecordsIrre',
     [
-        IrreController::class => 'index, list, show', //'index, list, show',
+        IrreController::class => 'index, list, show',
     ],
     [
         IrreController::class => '',

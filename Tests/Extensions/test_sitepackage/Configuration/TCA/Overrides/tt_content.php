@@ -4,10 +4,8 @@ declare(strict_types=1);
 
 use B13\Container\Tca\ContainerConfiguration;
 use B13\Container\Tca\Registry;
-use TYPO3\CMS\Core\Information\Typo3Version;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-#use TYPO3\CMS\Core\Utility\VersionNumberUtility;
 use TYPO3\CMS\Extbase\Utility\ExtensionUtility;
 
 defined('TYPO3') or die();
@@ -53,15 +51,11 @@ ExtensionManagementUtility::addTcaSelectItem(
     ],
 );
 
-
-
 ExtensionManagementUtility::addTCAcolumns(
     'tt_content',
     [
         'tx_testsitepacke_parent' => [
-             'label' => 'Inline Element parent field',
-
-            # 'description' => 'Group several content elements',
+            'label' => 'Inline Element parent field',
             'config' => [
                 'type' => 'passthrough',
             ],
@@ -81,7 +75,7 @@ ExtensionManagementUtility::addTCAcolumns(
                     'showPossibleLocalizationRecords' => true,
                 ],
             ],
-        ]
+        ],
     ],
 );
 
