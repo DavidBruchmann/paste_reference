@@ -60,9 +60,16 @@ plugin.tx_testsitepackage_inlinerecordsirre {
     pluginName = InlineRecordsIrre
     vendorName = Test
 
-    #settings.detailPid = 42
-    mvc.callDefaultActionIfActionCantBeResolved = 1
-    settings.foo = bar
+    mvc {
+        callDefaultActionIfActionCantBeResolved = 1
+    }
+    persistence {
+        storagePid = {$plugin.plugin.tx_testsitepackage_inlinerecordsirre.persistence.storagePid}
+    }
+    settings {
+        detailPid = {$plugin.plugin.tx_testsitepackage_inlinerecordsirre.persistence.storagePid}
+        settings.foo = bar
+    }
     view {
         layoutRootPaths {
             10 = EXT:test_sitepackage/Resources/Private/Layouts/ContentElements/
@@ -78,25 +85,6 @@ plugin.tx_testsitepackage_inlinerecordsirre {
             30 = {$plugin.tx_testsitepackage_inlinerecordsirre.view.templateRootPath}
         }
     }
-    persistence {
-        storagePid = 226
-        # {$plugin.plugin.tx_testsitepackage_inlinerecordsirre.persistence.storagePid}
-    }
-    /*
-    dataProcessing {
-        10 = TYPO3\CMS\Frontend\DataProcessing\DatabaseQueryProcessor
-        10 {
-            table = tt_content
-            where.data = field:uid
-            where.noTrimWrap = | tx_testsitepacke_parent = | AND tablenames = 'tt_content' |
-            orderBy = sorting
-            as = childElements
-        }
-    }
-    stdWrap {
-        debug = 1
-    }
-    */
 }
 
 tt_content.testsitepackage_inlinerecordsirre = EXTBASEPLUGIN
