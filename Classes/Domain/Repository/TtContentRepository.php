@@ -53,6 +53,7 @@ class TtContentRepository implements SingletonInterface
     protected bool $showHidden = true;
     protected BackendHelper $backendHelper;
     protected string $table = 'tt_content';
+    protected LocalizationRepository $localizationRepository;
 
     public function __construct()
     {
