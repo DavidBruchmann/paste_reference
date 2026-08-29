@@ -72,7 +72,7 @@ class TtContentRepository implements SingletonInterface
      * @param string $shortcutItem The single page to be used as the tree root
      * @param-out array $collectedItems The collected item data rows ordered by parent position, column position and sorting
      * @param int $parentUid uid of the referencing tt_content record
-     * @param int $language sys_language_uid of the referencing tt_content record
+     * @param int $languageId sys_language_uid of the referencing tt_content record
      * @param int $recursive The number of levels for the recursion
      * @throws DBALException
      */
@@ -141,7 +141,7 @@ class TtContentRepository implements SingletonInterface
      * @param string $shortcutItem The tt_content element to fetch the data fromom
      * @param-out array $collectedItems The collected item data row
      * @param int $parentUid uid of the referencing tt_content record
-     * @param int $language sys_language_uid of the referencing tt_content record
+     * @param int $languageId sys_language_uid of the referencing tt_content record
      * @throws DBALException
      */
     public function collectContentData(
