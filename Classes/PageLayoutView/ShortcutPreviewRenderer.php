@@ -172,8 +172,8 @@ class ShortcutPreviewRenderer implements PreviewRendererInterface
             $dataRow['shortcutItems'] = [];
             foreach ($collectedItems as $item) {
                 if ($item) {
-                    $itemObj = $this->recordFactory->createFromDatabaseRow('tt_content', $item);
-                    $renderItems[] = $itemObj; // $this->prepareRecord($itemObj);
+                    $itemObj = $this->recordFactory->createResolvedRecordFromDatabaseRow('tt_content', $item);
+                    $renderItems[] = $itemObj;
                 }
             }
         }
@@ -251,9 +251,8 @@ class ShortcutPreviewRenderer implements PreviewRendererInterface
             $rawRecord->getComputedProperties(),
             $rawRecord->getFullType()
         );
-        $fakeRecord = GeneralUtility::makeInstance(
-            Record::class,
-            $rawFakeRecord,
+        $fakeRecord = $this->recordFactory->createResolvedRecordFromDatabaseRow(
+            'tt_content',
             $fakeRecordDataRow
         );
         $gridColumnItem->setRecord($fakeRecord);
