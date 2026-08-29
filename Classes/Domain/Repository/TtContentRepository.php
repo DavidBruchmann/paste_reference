@@ -258,4 +258,3 @@ class TtContentRepository implements SingletonInterface
             ->getConnectionForTable($this->table);
     }
 }
-
