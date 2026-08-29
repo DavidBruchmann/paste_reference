@@ -118,10 +118,6 @@ class TtContentRepository implements SingletonInterface
         while ($item = $result->fetchAssociative()) {
             if (!empty($this->extensionConfiguration['overlayShortcutTranslation']) && (int)$languageId > 0) {
                 $translatedItem = $this->localizationRepository->getRecordTranslation($this->table, (int)($item['uid'] ?? 0), (int)$languageId);
-                if (is_array($translatedItem) && !empty($translatedItem)) {
-                    $item = array_shift($translatedItem);
-                    //$translation = $translations[0];
-                }
             }
             if ($this->backendHelper->getBackendUser()->workspace > 0) {
                 unset($item['inSet']);
@@ -173,10 +169,6 @@ class TtContentRepository implements SingletonInterface
                 ->fetchAssociative();
             if (!empty($this->extensionConfiguration['overlayShortcutTranslation']) && (int)$languageId > 0) {
                 $translatedItem = $this->localizationRepository->getRecordTranslation($this->table, (int)($item['uid'] ?? 0), (int)$languageId);
-                if (is_array($translatedItem) && !empty($translatedItem)) {
-                    $item = array_shift($translatedItem);
-                    //$translation = $translations[0];
-                }
             }
 
             if ($this->backendHelper->getBackendUser()->workspace > 0) {
