@@ -103,7 +103,7 @@ class ShortcutPreviewRenderer implements PreviewRendererInterface
             foreach ($shortCutRenderItems as $shortcutRecord) {
                 $shortcutItem = GeneralUtility::makeInstance(
                     GridColumnItem::class,
-                    $gridColumnItem->getContext(),
+                    $gridColumnItem->getContext(), // false positive of #102621 in Extension Scanner
                     $gridColumnItem->getColumn(),
                     $shortcutRecord
                 );

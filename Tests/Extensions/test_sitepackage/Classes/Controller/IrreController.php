@@ -25,7 +25,7 @@ class IrreController extends ActionController
     {
         // $pageId = $this->request->getAttributes()['routing']->getPageId();
         $cObj = $this->request->getAttribute('currentContentObject');
-        $data = $cObj->data;
+        $data = $cObj->data; // false positive of #101995 in Extension Scanner
         $currentRecord = $this->irreRepository->findByUid((int)$data['uid']);
         $childRecords = $this->irreRepository->getChildRecords((int)$data['uid']);
         $this->view->assign('data', $data);
@@ -37,7 +37,7 @@ class IrreController extends ActionController
     {
         // $pageId = $this->request->getAttributes()['routing']->getPageId();
         $cObj = $this->request->getAttribute('currentContentObject');
-        $data = $cObj->data;
+        $data = $cObj->data; // false positive of #101995 in Extension Scanner
         $currentRecord = $this->irreRepository->findByUid((int)$data['uid']);
         $childRecords = $this->irreRepository->getChildRecords((int)$data['uid']);
         $this->view->assign('data', $data);
@@ -49,7 +49,7 @@ class IrreController extends ActionController
     {
         // $pageId = $this->request->getAttributes()['routing']->getPageId();
         $cObj = $this->request->getAttribute('currentContentObject');
-        $data = $cObj->data;
+        $data = $cObj->data; // false positive of #101995 in Extension Scanner
         $currentRecord = $this->irreRepository->findByUid((int)$data['uid']);
         $childRecords = $this->irreRepository->getChildRecords((int)$data['uid']);
         $this->view->assign('data', $data);

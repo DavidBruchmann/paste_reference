@@ -29,6 +29,7 @@ use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Exception as DBALException;
 use Doctrine\DBAL\Exception\DriverException as DBALDriverException;
 use EHAERER\PasteReference\Helper\BackendHelper;
+use TYPO3\CMS\Backend\Domain\Repository\Localization\LocalizationRepository;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
 use TYPO3\CMS\Core\Database\Connection;
@@ -59,6 +60,7 @@ class TtContentRepository implements SingletonInterface
         $emConf = GeneralUtility::makeInstance(ExtensionConfiguration::class)->get('paste_reference') ?? [];
         $this->extensionConfiguration = $emConf;
         $this->backendHelper = GeneralUtility::makeInstance(BackendHelper::class);
+        $this->localizationRepository = GeneralUtility::makeInstance(LocalizationRepository::class);
     }
 
     /**
@@ -77,7 +79,7 @@ class TtContentRepository implements SingletonInterface
         string $shortcutItem,
         array &$collectedItems,
         int $parentUid = 0,
-        int $language = 0,
+        int $languageId = 0,
         int $recursive = 0  // TODO: $recursive never seems being used
     ): void {
         $itemList = str_replace('pages_', '', $shortcutItem);
@@ -113,10 +115,11 @@ class TtContentRepository implements SingletonInterface
 
         /** @ var array<string,mixed>|false $item */
         while ($item = $result->fetchAssociative()) {
-            if (!empty($this->extensionConfiguration['overlayShortcutTranslation']) && $language > 0) {
-                $translatedItem = BackendUtility::getRecordLocalization('tt_content', (int)($item['uid'] ?? 0), $language) ?: [];
-                if (is_array($translatedItem) && $translatedItem !== []) {
+            if (!empty($this->extensionConfiguration['overlayShortcutTranslation']) && (int)$languageId > 0) {
+                $translatedItem = $this->localizationRepository->getRecordTranslation($this->table, (int)($item['uid'] ?? 0), (int)$languageId);
+                if (is_array($translatedItem) && !empty($translatedItem)) {
                     $item = array_shift($translatedItem);
+                    //$translation = $translations[0];
                 }
             }
             if ($this->backendHelper->getBackendUser()->workspace > 0) {
@@ -144,7 +147,7 @@ class TtContentRepository implements SingletonInterface
         string $shortcutItem,
         array &$collectedItems,
         int $parentUid,
-        int $language
+        int $languageId
     ): void {
         $shortcutItem = str_replace('tt_content_', '', $shortcutItem);
         if ((int)$shortcutItem !== $parentUid) {
@@ -167,10 +170,11 @@ class TtContentRepository implements SingletonInterface
                 ->setMaxResults(1)
                 ->executeQuery()
                 ->fetchAssociative();
-            if (!empty($this->extensionConfiguration['overlayShortcutTranslation']) && $language > 0) {
-                $translatedItem = BackendUtility::getRecordLocalization('tt_content', (int)($item['uid'] ?? 0), $language) ?: [];
-                if (is_array($translatedItem) && $translatedItem !== []) {
+            if (!empty($this->extensionConfiguration['overlayShortcutTranslation']) && (int)$languageId > 0) {
+                $translatedItem = $this->localizationRepository->getRecordTranslation($this->table, (int)($item['uid'] ?? 0), (int)$languageId);
+                if (is_array($translatedItem) && !empty($translatedItem)) {
                     $item = array_shift($translatedItem);
+                    //$translation = $translations[0];
                 }
             }
 
@@ -235,10 +239,6 @@ class TtContentRepository implements SingletonInterface
             ->executeStatement();
     }
 
-    /**
-     * @param string $table
-     * @return QueryBuilder
-     */
     public function getQueryBuilder(string $table = 'tt_content'): QueryBuilder
     {
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
@@ -257,3 +257,4 @@ class TtContentRepository implements SingletonInterface
             ->getConnectionForTable($this->table);
     }
 }
+
